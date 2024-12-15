@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Help App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light Mode Colors */
+      --primary-color: #4a6cf7;
+      --secondary-color: #32b67a;
+      --background-color: #f4f7fa;
+      --text-color: #2c3e50;
+      --text-muted: #6c757d;
+      --container-bg: white;
+      --input-bg: #f9fafb;
+      --input-border: #e0e4e8;
+      --error-color: #ff4d4f;
+      --gradient-primary: linear-gradient(135deg, #4a6cf7 0%, #6a11cb 100%);
+      --gradient-secondary: linear-gradient(135deg, #32b67a 0%, #1cb5b5 100%);
+      --shadow-primary: rgba(74, 108, 247, 0.3);
+      --shadow-subtle: rgba(0, 0, 0, 0.08);
+    }
+
+    /* Dark Mode Colors */
+    [data-theme='dark'] {
+      --primary-color: #5e81f3;
+      --secondary-color: #2ecc71;
+      --background-color: #121212;
+      --text-color: #e0e0e0;
+      --text-muted: #a0a0a0;
+      --container-bg: #1e1e1e;
+      --input-bg: #2a2a2a;
+      --input-border: #3a3a3a;
+      --error-color: #ff6b6b;
+      --gradient-primary: linear-gradient(135deg, #5e81f3 0%, #8a4fff 100%);
+      --gradient-secondary: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      --shadow-primary: rgba(94, 129, 243, 0.2);
+      --shadow-subtle: rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      line-height: 1.6;
+      color: var(--text-color);
+      perspective: 1000px;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(180deg);
+      background: var(--secondary-color);
+    }
+
+    .container {
+      background: var(--container-bg);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px var(--shadow-subtle), 0 5px 15px var(--shadow-subtle);
+      width: 100%;
+      max-width: 450px;
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+      border: 1px solid var(--input-border);
+      transition: all 0.3s ease;
+      transform-origin: center;
+    }
+
+    @keyframes fadeIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px) rotateX(-10deg); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0) rotateX(0); 
+      }
+    }
+
+    .container.active {
+      display: block;
+    }
+
+    h1 {
+      text-align: center;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--gradient-primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px var(--shadow-primary);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px var(--shadow-primary);
+    }
+
+    .back-btn {
+      background: var(--gradient-secondary);
+      box-shadow: 0 5px 15px rgba(50, 182, 122, 0.3);
+    }
+
+    .back-btn:hover {
+      background: var(--gradient-secondary);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(50, 182, 122, 0.4);
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff4d4f 100%);
+      box-shadow: 0 5px 15px rgba(255, 77, 79, 0.3);
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 77, 79, 0.4);
+    }
+
+    #viewRequests ul {
+      list-style-type: none;
+      max-height: 300px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-color) transparent;
+    }
+
+    #viewRequests li {
+      background: var(--input-bg);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px var(--shadow-subtle);
+      transition: all 0.3s ease;
+      color: var(--text-color);
+    }
+
+    #viewRequests li:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px var(--shadow-subtle);
+    }
+
+    #viewRequests li button {
+      width: auto;
+      margin-left: 10px;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        width: 95%;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+  <!-- Sign-Up Screen -->
+  <div id="signUpScreen" class="container active">
+    <h1>Sign Up</h1>
+    <input type="text" id="signUpUsername" placeholder="Enter your username">
+    <input type="password" id="signUpPassword" placeholder="Enter your password">
+    <input type="password" id="signUpPasswordConfirm" placeholder="Re-enter your password">
+    <button onclick="signUp()">Sign Up</button>
+    <button class="back-btn" onclick="switchToLogin()">Already have an account? Log In</button>
+  </div>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="container">
+    <h1>Log In</h1>
+    <input type="text" id="loginUsername" placeholder="Enter your username">
+    <input type="password" id="loginPassword" placeholder="Enter your password">
+    <button onclick="login()">Log In</button>
+    <button class="back-btn" onclick="switchToSignUp()">Don't have an account? Sign Up</button>
+  </div>
+
+  <!-- Main Menu -->
+  <div id="mainMenu" class="container">
+    <h1>Community Help App</h1>
+    <p>Welcome, <span id="welcomeUser"></span>!</p>
+    <button onclick="showForm()">Post Request</button>
+    <button onclick="showRequests()">View Requests</button>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  </div>
+
+  <!-- Post Request Form -->
+  <div id="postForm" class="container">
+    <h1>Post a Request</h1>
+    <input type="text" id="requestTitle" placeholder="Request Title">
+    <textarea id="requestDescription" placeholder="Request Description"></textarea>
+    <button onclick="submitRequest()">Submit Request</button>
+    <button class="back-btn" onclick="goBack()">Back</button>
+  </div>
+
+  <!-- View Requests -->
+  <div id="viewRequests" class="container">
+    <h1>View Requests</h1>
+    <ul id="requestsList"></ul>
+    <button class="back-btn" onclick="goBack()">Back</button>
+  </div>
+
+  <script>
+    // Theme Toggle Functionality
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+
+    // Check for Saved Theme
+    function checkTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    }
+
+    // Run theme check on page load
+    checkTheme();
+
+    // Rest of the previous JavaScript remains exactly the same
+    let currentUser = null;
+
+    // Sign-Up Functionality
+    function signUp() {
+      const username = document.getElementById('signUpUsername').value;
+      const password = document.getElementById('signUpPassword').value;
+      const confirmPassword = document.getElementById('signUpPasswordConfirm').value;
+
+      if (!username || !password || !confirmPassword) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      if (users[username]) {
+        alert('Username already exists!');
+        return;
+      }
+
+      users[username] = password;
+      localStorage.setItem('users', JSON.stringify(users));
+      alert('Sign-Up successful! You can now log in.');
+      switchToLogin();
+    }
+
+    // Login Functionality
+    function login() {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      if (users[username] === password) {
+        currentUser = username;
+        document.getElementById('welcomeUser').textContent = currentUser;
+        showMenu();
+      } else {
+        alert('Invalid username or password!');
+      }
+    }
+
+    // Logout Functionality
+    function logout() {
+      currentUser = null;
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      
+      document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
+      document.getElementById('loginScreen').classList.add('active');
+    }
+
+    // Switch Screens
+    function switchToSignUp() {
+      document.getElementById('signUpUsername').value = '';
+      document.getElementById('signUpPassword').value = '';
+      document.getElementById('signUpPasswordConfirm').value = '';
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+
+      document.getElementById('signUpScreen').classList.add('active');
+      document.getElementById('loginScreen').classList.remove('active');
+    }
+
+    function switchToLogin() {
+      document.getElementById('signUpUsername').value = '';
+      document.getElementById('signUpPassword').value = '';
+      document.getElementById('signUpPasswordConfirm').value = '';
+
+      document.getElementById('loginScreen').classList.add('active');
+      document.getElementById('signUpScreen').classList.remove('active');
+    }
+
+    function showMenu() {
+      document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
+      document.getElementById('mainMenu').classList.add('active');
+    }
+
+    function showForm() {
+      document.getElementById('mainMenu').classList.remove('active');
+      document.getElementById('postForm').classList.add('active');
+    }
+
+    function showRequests() {
+      document.getElementById('mainMenu').classList.remove('active');
+      document.getElementById('viewRequests').classList.add('active');
+      displayRequests();
+    }
+
+    function goBack() {
+      document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
+      document.getElementById('mainMenu').classList.add('active');
+    }
+
+    // Post Request
+    function submitRequest() {
+      const title = document.getElementById('requestTitle').value;
+      const description = document.getElementById('requestDescription').value;
+
+      if (title && description) {
+        const requests = JSON.parse(localStorage.getItem('requests')) || [];
+        requests.push({ username: currentUser, title, description, resolved: false });
+        localStorage.setItem('requests', JSON.stringify(requests));
+        alert('Request Submitted!');
+        document.getElementById('requestTitle').value = '';
+        document.getElementById('requestDescription').value = '';
+        goBack();
+      } else {
+        alert('Please fill in all fields.');
+      }
+    }
+
+    // Display Requests
+    function displayRequests() {
+      const requestsList = document.getElementById('requestsList');
+      const requests = JSON.parse(localStorage.getItem('requests')) || [];
+      requestsList.innerHTML = '';
+
+      requests.forEach((request, index) => {
+        if (!request.resolved) {
+          const li = document.createElement('li');
+          li.textContent = `${request.title}: ${request.description} (by ${request.username})`;
+          if (request.username === currentUser) {
+            const resolveBtn = document.createElement('button');
+            resolveBtn.textContent = 'Resolve';
+            resolveBtn.onclick = () => resolveRequest(index);
+            li.appendChild(resolveBtn);
+          }
+
+          requestsList.appendChild(li);
+        }
+      });
+    }
+
+    // Resolve Request
+    function resolveRequest(index) {
+      const requests = JSON.parse(localStorage.getItem('requests')) || [];
+      requests[index].resolved = true;
+      localStorage.setItem('requests', JSON.stringify(requests));
+      alert('Request marked as resolved!');
+      displayRequests();
+    }
+  </script>
+</body>
+</html>
